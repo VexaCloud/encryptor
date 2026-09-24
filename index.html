@@ -1,654 +1,826 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message Encryptor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-      :root {
-        --bg: #0d0d0d;
-        --container: #141414;
-        --red: #ff0033;
-        --red-glow: #ff1a44;
-        --red-dark: #b30024;
-        --text: #e0e0e0;
-        --text-dim: #888;
-        --border: #2a0000;
-        --input-bg: #1a1a1a;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Message Encryptor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #171a22;
+      --surface-2: #1e222d;
+      --border: #2a2f3d;
+      --border-hover: #3a4155;
+      --text: #e8eaed;
+      --text-muted: #9aa0a6;
+      --text-dim: #6b7280;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-soft: rgba(59, 130, 246, 0.12);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
 
-      * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-      body {
-        font-family: 'Roboto Mono', monospace;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        margin: 0;
-        padding: 40px 20px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        background-image: 
-          radial-gradient(circle at 15% 50%, rgba(180,0,30,0.08) 0%, transparent 40%),
-          radial-gradient(circle at 85% 30%, rgba(180,0,30,0.06) 0%, transparent 45%);
-      }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 48px 20px;
+      line-height: 1.5;
+    }
 
-      .container {
-        background: var(--container);
-        width: 100%;
-        max-width: 760px;
-        padding: 50px 36px;
-        border-radius: 18px;
-        border: 2px solid var(--border);
-        box-shadow: 
-          0 0 70px rgba(180,0,30,0.12),
-          inset 0 0 50px rgba(0,0,0,0.65),
-          0 0 0 1px rgba(255,0,51,0.08);
-        position: relative;
-        overflow: hidden;
-      }
+    .container {
+      background: var(--surface);
+      width: 100%;
+      max-width: 640px;
+      padding: 40px 36px 36px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
 
-      .container::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle at 30% 20%, rgba(255,20,60,0.07) 0%, transparent 60%);
-        pointer-events: none;
-        animation: pulse 20s infinite alternate;
-      }
+    /* Header */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
 
-      @keyframes pulse {
-        0% { opacity: 0.25; transform: scale(1); }
-        100% { opacity: 0.65; transform: scale(1.12); }
-      }
+    .header-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
 
-      .header-area {
-        text-align: center;
-        margin-bottom: 60px;
-        position: relative;
-      }
+    .header-text p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
 
-      h2 {
-        font-family: 'Orbitron', sans-serif;
-        font-size: 3.4rem;
-        font-weight: 900;
-        color: var(--red);
-        text-shadow: 0 0 24px var(--red-glow), 0 0 48px rgba(255,0,51,0.45);
-        margin: 0 0 12px;
-        letter-spacing: 6px;
-      }
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
 
-      h4 {
-        font-size: 1.25rem;
-        color: #555;
-        margin: 0;
-        letter-spacing: 3px;
-        font-weight: 500;
-      }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
 
-      .top-buttons {
-        position: absolute;
-        top: 0;
-        right: 0;
-        display: flex;
-        gap: 16px;
-        z-index: 10;
-      }
+    .icon-btn:hover {
+      background: var(--border);
+      color: var(--text);
+      border-color: var(--border-hover);
+    }
 
-      .icon-btn {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-        background: #1f0000;
-        border: 1px solid #3a0000;
-        color: var(--red);
-        font-size: 1.6rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.6);
-      }
+    /* Form elements */
+    label.field-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
 
-      .icon-btn:hover {
-        background: var(--red-dark);
-        color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(180,0,30,0.4);
-      }
+    .input-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
 
-      textarea, input[type="text"] {
-        width: 100%;
-        padding: 18px 22px;
-        margin-bottom: 32px;
-        background: var(--input-bg);
-        border: 2px solid #2a0000;
-        border-radius: 12px;
-        color: #eee;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 1.15rem;
-        line-height: 1.5;
-        resize: none;
-        transition: all 0.2s;
-      }
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      resize: vertical;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
 
-      textarea:focus, input:focus {
-        outline: none;
-        border-color: var(--red);
-        box-shadow: 0 0 0 4px rgba(255,0,51,0.2);
-      }
+    textarea {
+      min-height: 140px;
+    }
 
-      textarea:not(#vigenereKey) {
-        min-height: 180px;
-      }
+    textarea:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
 
-      #vigenereKey {
-        min-height: 56px;
-        padding-right: 80px;
-      }
+    textarea::placeholder,
+    input::placeholder {
+      color: var(--text-dim);
+    }
 
-      .input-container {
-        position: relative;
-        margin-bottom: 40px;
-      }
+    #vigenereKey {
+      padding-right: 48px;
+      min-height: 48px;
+    }
 
-      .indicator {
-        position: absolute;
-        top: 50%;
-        right: 24px;
-        transform: translateY(-50%);
-        font-size: 1.6rem;
-      }
+    .key-indicator {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
 
-      ::placeholder {
-        color: #666;
-        opacity: 0.8;
-      }
+    .clear-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
 
-      .action-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin: 50px 0 60px;
-      }
+    .clear-btn:hover {
+      background: var(--error);
+      border-color: var(--error);
+      color: white;
+    }
 
-      button.main-btn {
-        flex: 1;
-        max-width: 300px;
-        padding: 20px;
-        font-size: 1.3rem;
-        font-weight: 700;
-        background: linear-gradient(145deg, #c4002a, #90001f);
-        color: white;
-        border: none;
-        border-radius: 14px;
-        cursor: pointer;
-        transition: all 0.22s;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        box-shadow: 0 5px 18px rgba(180,0,30,0.45);
-      }
+    /* Action buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin: 8px 0 28px;
+    }
 
-      button.main-btn:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 14px 35px rgba(200,0,40,0.6);
-        background: linear-gradient(145deg, #ff1a44, #c4002a);
-      }
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
 
-      .output-area {
-        position: relative;
-        margin-bottom: 40px;
-      }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
 
-      #outputMessage {
-        min-height: 200px;
-      }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
 
-      .copy-button {
-        position: absolute;
-        bottom: 28px;
-        right: 28px;
-        background: #1f0000;
-        color: var(--red);
-        border: 1px solid #3a0000;
-        padding: 14px 22px;
-        border-radius: 12px;
-        cursor: pointer;
-        font-size: 1.2rem;
-        transition: all 0.2s;
-      }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
 
-      .copy-button:hover {
-        background: var(--red-dark);
-        color: white;
-        transform: scale(1.1);
-      }
+    .btn-secondary:hover {
+      background: var(--border);
+      border-color: var(--border-hover);
+    }
 
-      .status-message {
-        text-align: center;
-        font-weight: 500;
-        margin-top: 20px;
-        min-height: 30px;
-        font-size: 1.15rem;
-      }
+    /* Output */
+    .output-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
 
-      .clear-button {
-        position: absolute;
-        top: 16px;
-        right: 20px;
-        background: #2a0000;
-        color: #ff4d4d;
-        border: 1px solid #500000;
-        padding: 10px 18px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1.15rem;
-        transition: all 0.2s;
-      }
+    #outputMessage {
+      min-height: 160px;
+      padding-bottom: 52px;
+    }
 
-      .clear-button:hover {
-        background: #500000;
-        color: white;
-      }
+    .copy-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
 
-      /* Modal */
-      .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.88);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(6px);
-      }
+    .copy-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
 
-      .modal-content {
-        background: #111;
-        border: 2px solid #3a0000;
-        border-radius: 16px;
-        width: 90%;
-        max-width: 580px;
-        max-height: 90vh;
-        overflow-y: auto;
-        padding: 40px;
-        box-shadow: 0 0 90px rgba(180,0,30,0.3);
-      }
+    .status {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 500;
+      min-height: 24px;
+      color: var(--text-muted);
+    }
 
-      .modal-close {
-        float: right;
-        font-size: 2.4rem;
-        color: #777;
-        cursor: pointer;
-      }
+    .status.success { color: var(--success); }
+    .status.error { color: var(--error); }
+    .status.warning { color: var(--warning); }
 
-      .modal-close:hover {
-        color: var(--red);
-      }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+      padding: 20px;
+    }
 
-      .toggle-container label {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 0;
-        border-bottom: 1px solid #222;
-        color: #ddd;
-        font-size: 1.1rem;
-      }
+    .modal.open {
+      display: flex;
+    }
 
-      #frequencySlider {
-        -webkit-appearance: none;
-        width: 100%;
-        height: 10px;
-        background: #222;
-        border-radius: 5px;
-        outline: none;
-        margin: 20px 0;
-      }
+    .modal-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    }
 
-      #frequencySlider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 26px;
-        height: 26px;
-        background: var(--red);
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 14px var(--red-glow);
-      }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
 
-      #frequencySlider::-moz-range-thumb {
-        width: 26px;
-        height: 26px;
-        background: var(--red);
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 0 14px var(--red-glow);
-      }
+    .modal-header h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
 
-      .frequency-container span {
-        font-size: 1rem;
-        color: #777;
-      }
-    </style>
-  </head>
-  <body>
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
 
-    <div id="historyModal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeHistoryModal()">×</span>
-        <h3 style="color:var(--red); text-shadow:0 0 15px var(--red-glow);">HELP / INFO</h3>
-        <hr style="border-color:#3a0000; margin: 24px 0;">
-        <p style="line-height:1.7; font-size:1.1rem;">
-          Message Encryptor — multi-layer secret message tool<br><br>
-          MADE BY HACKER114<br><br>
-          Default: 9 stacked encoding methods<br>
-          Customize in settings (gear icon)<br>
-          Add your own key (one word only)<br>
-          Dead characters = extra obfuscation<br><br>
-          Stay hidden.
-        </p>
-        <hr style="border-color:#3a0000; margin: 28px 0;">
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .modal-body p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    .modal-body ul {
+      margin: 12px 0 0 18px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .modal-body li {
+      margin-bottom: 6px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    /* Toggle rows */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+
+    .toggle-row:last-of-type {
+      border-bottom: none;
+    }
+
+    /* Custom toggle switch */
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--border);
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Frequency slider */
+    .freq-section {
+      margin-top: 8px;
+    }
+
+    .freq-section label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    #frequencySlider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    #frequencySlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--surface);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    #frequencySlider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--surface);
+    }
+
+    .freq-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2>About</h2>
+        <button class="modal-close" onclick="closeHelp()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Message Encryptor</strong> applies a configurable stack of classical encodings and ciphers.</p>
+        <p>Enable or disable individual layers in Settings. Supply a single alphabetic word as the Vigenère key (or leave blank for the default).</p>
+        <ul>
+          <li>Layers are applied in a fixed order on encrypt and reversed on decrypt.</li>
+          <li>“Dead characters” inject random noise at a chosen frequency for extra obfuscation.</li>
+          <li>The same key and settings must be used for both encrypt and decrypt.</li>
+        </ul>
       </div>
     </div>
+  </div>
 
-    <div class="container">
-      <div class="top-buttons">
-        <div class="icon-btn" onclick="openHistoryModal()" title="Help"><i class="fa-solid fa-question"></i></div>
-        <div class="icon-btn" onclick="openModal()" title="Settings"><i class="fa-solid fa-cog"></i></div>
-        <div class="icon-btn" onclick="openGit()"><i class="fa-brands fa-github"></i></div>
-        <div class="icon-btn" onclick="openWeb()"><i class="fa-solid fa-globe"></i></div>
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" onclick="closeSettings()">&times;</button>
       </div>
 
-      <div class="header-area">
-        <h2>MESSAGE ENCRYPTOR</h2>
-        <h4>MADE BY HACKER114</h4>
+      <div class="toggle-row">
+        <span>Caesar Cipher</span>
+        <label class="switch"><input type="checkbox" id="toggleCaesar" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Vigenère Cipher</span>
+        <label class="switch"><input type="checkbox" id="toggleVigenere" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Octal</span>
+        <label class="switch"><input type="checkbox" id="toggleOctal" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Hexadecimal</span>
+        <label class="switch"><input type="checkbox" id="toggleHex" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Binary</span>
+        <label class="switch"><input type="checkbox" id="toggleBinary" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Base64</span>
+        <label class="switch"><input type="checkbox" id="toggleBase64" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>ROT13</span>
+        <label class="switch"><input type="checkbox" id="toggleRot13" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Atbash</span>
+        <label class="switch"><input type="checkbox" id="toggleAtbash" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Dead Characters</span>
+        <label class="switch"><input type="checkbox" id="toggleDeadLetters" checked><span class="slider"></span></label>
       </div>
 
-      <div class="input-container">
-        <textarea id="inputMessage" placeholder="ENTER YOUR MESSAGE HERE..."></textarea>
-        <button class="clear-button" onclick="clearInput()"><i class="fa-solid fa-trash-can"></i></button>
-      </div>
+      <hr>
 
-      <div class="input-container">
-        <input type="text" id="vigenereKey" placeholder="CUSTOM KEY (ONE WORD ONLY)" oninput="validateKey()">
-        <i class="indicator" id="keyIndicator"></i>
-      </div>
-
-      <div class="action-buttons">
-        <button class="main-btn" onclick="encodeMessage()">ENCRYPT</button>
-        <button class="main-btn" onclick="decodeMessage()">DECRYPT</button>
-      </div>
-
-      <div class="output-area">
-        <textarea id="outputMessage" placeholder="ENCRYPTED / DECRYPTED RESULT..." readonly></textarea>
-        <button class="copy-button" onclick="copyOutput()"><i class="fa-solid fa-copy"></i> COPY</button>
-      </div>
-
-      <div class="status-message" id="statusMessage"></div>
-    </div>
-
-    <div id="settingsModal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeModal()">×</span>
-        <h3 style="color:var(--red); text-shadow:0 0 15px var(--red-glow);">SETTINGS</h3>
-        <hr style="border-color:#3a0000; margin: 24px 0;">
-
-        <div class="toggle-container">
-          <label>Caesar Cipher          <div class="toggle-switch"><input type="checkbox" id="toggleCaesar" checked><span class="slider"></span></div></label>
-          <label>Octal                   <div class="toggle-switch"><input type="checkbox" id="toggleOctal" checked><span class="slider"></span></div></label>
-          <label>Hexadecimal             <div class="toggle-switch"><input type="checkbox" id="toggleHex" checked><span class="slider"></span></div></label>
-          <label>Binary                  <div class="toggle-switch"><input type="checkbox" id="toggleBinary" checked><span class="slider"></span></div></label>
-          <label>Base64                  <div class="toggle-switch"><input type="checkbox" id="toggleBase64" checked><span class="slider"></span></div></label>
-          <label>ROT13                   <div class="toggle-switch"><input type="checkbox" id="toggleRot13" checked><span class="slider"></span></div></label>
-          <label>Vigenère Cipher         <div class="toggle-switch"><input type="checkbox" id="toggleVigenere" checked><span class="slider"></span></div></label>
-          <label>Atbash                  <div class="toggle-switch"><input type="checkbox" id="toggleAtbash" checked><span class="slider"></span></div></label>
-          <label>Dead Characters         <div class="toggle-switch"><input type="checkbox" id="toggleDeadLetters" checked><span class="slider"></span></div></label>
+      <div class="freq-section">
+        <label for="frequencySlider">Dead-character frequency</label>
+        <input type="range" id="frequencySlider" min="1" max="10" value="3">
+        <div class="freq-labels">
+          <span>Every char</span>
+          <span>Every 10th</span>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <hr style="border-color:#3a0000; margin: 28px 0;">
-
-        <div class="frequency-container">
-          <label for="frequencySlider">Dead Character Frequency:</label>
-          <input type="range" id="frequencySlider" min="1" max="10" value="1">
-          <br><br>
-          <span>Every other character  ←───────────────────→  Every 10 characters</span>
-        </div>
-
-        <hr style="border-color:#3a0000; margin: 28px 0;">
+  <!-- Main UI -->
+  <div class="container">
+    <div class="header">
+      <div class="header-text">
+        <h1>Message Encryptor</h1>
+        <p>Multi-layer classical encoding</p>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" onclick="openHelp()" title="Help"><i class="fa-solid fa-circle-question"></i></button>
+        <button class="icon-btn" onclick="openSettings()" title="Settings"><i class="fa-solid fa-gear"></i></button>
       </div>
     </div>
 
-    <script>
-      // ────────────────────────────────────────────────
-      // VALIDATION & UI HELPERS
-      // ────────────────────────────────────────────────
-      function validateKey() {
-        const key = document.getElementById('vigenereKey').value.trim();
-        const indicator = document.getElementById('keyIndicator');
-        if (key.split(' ').length > 1) {
-          indicator.innerHTML = '<i class="fas fa-times-circle"></i>';
-          indicator.style.color = '#ff4d4d';
-        } else {
-          indicator.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-          indicator.style.color = 'var(--red)';
-        }
-      }
+    <div class="input-group">
+      <label class="field-label" for="inputMessage">Message</label>
+      <textarea id="inputMessage" placeholder="Enter the text to encrypt or decrypt…"></textarea>
+      <button class="clear-btn" onclick="clearAll()" title="Clear"><i class="fa-solid fa-trash-can"></i></button>
+    </div>
 
-      function showMessage(msg, type = 'success') {
-        const el = document.getElementById('statusMessage');
-        el.textContent = msg;
-        el.style.color = type === 'error' ? '#ff4d4d' : (type === 'warning' ? '#ffcc00' : 'var(--red)');
-        setTimeout(() => el.textContent = '', 4500);
-      }
+    <div class="input-group">
+      <label class="field-label" for="vigenereKey">Vigenère key <span style="font-weight:400;text-transform:none">(letters only, optional)</span></label>
+      <input type="text" id="vigenereKey" placeholder="Leave blank for default" autocomplete="off" spellcheck="false" oninput="validateKey()">
+      <span class="key-indicator" id="keyIndicator"></span>
+    </div>
 
-      function clearInput() {
-        document.getElementById('inputMessage').value = '';
-        document.getElementById('outputMessage').value = '';
-        showMessage('Input & output cleared', 'warning');
-      }
+    <div class="actions">
+      <button class="btn btn-primary" onclick="encodeMessage()">Encrypt</button>
+      <button class="btn btn-secondary" onclick="decodeMessage()">Decrypt</button>
+    </div>
 
-      function copyOutput() {
-        const out = document.getElementById('outputMessage');
+    <div class="output-group">
+      <label class="field-label" for="outputMessage">Result</label>
+      <textarea id="outputMessage" placeholder="Encrypted or decrypted output appears here…" readonly></textarea>
+      <button class="copy-btn" onclick="copyOutput()"><i class="fa-solid fa-copy"></i> Copy</button>
+    </div>
+
+    <div class="status" id="statusMessage"></div>
+  </div>
+
+  <script>
+    // ─── UI helpers ───────────────────────────────────────────────
+    function validateKey() {
+      const raw = document.getElementById('vigenereKey').value.trim();
+      const indicator = document.getElementById('keyIndicator');
+      if (!raw) {
+        indicator.innerHTML = '';
+        return true;
+      }
+      // Allow only letters (spaces already disallowed by “one word”)
+      if (/\s/.test(raw) || /[^a-zA-Z]/.test(raw)) {
+        indicator.innerHTML = '<i class="fas fa-times-circle" style="color:var(--error)"></i>';
+        return false;
+      }
+      indicator.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i>';
+      return true;
+    }
+
+    function showStatus(msg, type = 'success') {
+      const el = document.getElementById('statusMessage');
+      el.textContent = msg;
+      el.className = 'status ' + type;
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => {
+        el.textContent = '';
+        el.className = 'status';
+      }, 4000);
+    }
+
+    function clearAll() {
+      document.getElementById('inputMessage').value = '';
+      document.getElementById('outputMessage').value = '';
+      showStatus('Cleared', 'warning');
+    }
+
+    function copyOutput() {
+      const out = document.getElementById('outputMessage');
+      if (!out.value) {
+        showStatus('Nothing to copy', 'warning');
+        return;
+      }
+      navigator.clipboard.writeText(out.value).then(() => {
+        showStatus('Copied to clipboard');
+      }).catch(() => {
         out.select();
         document.execCommand('copy');
-        showMessage('Result copied to clipboard');
-      }
+        showStatus('Copied to clipboard');
+      });
+    }
 
-      function openModal()          { document.getElementById('settingsModal').style.display = 'flex'; }
-      function closeModal()         { document.getElementById('settingsModal').style.display = 'none'; }
-      function openHistoryModal()   { document.getElementById('historyModal').style.display = 'flex'; }
-      function closeHistoryModal()  { document.getElementById('historyModal').style.display = 'none'; }
-      function openGit()            { window.open('https://github.com', '_blank'); }
-      function openWeb()            { window.open('about:blank', '_blank'); }
+    function openHelp()    { document.getElementById('helpModal').classList.add('open'); }
+    function closeHelp()   { document.getElementById('helpModal').classList.remove('open'); }
+    function openSettings(){ document.getElementById('settingsModal').classList.add('open'); }
+    function closeSettings(){ document.getElementById('settingsModal').classList.remove('open'); }
 
-      // ────────────────────────────────────────────────
-      // ENCODING / DECODING FUNCTIONS (unchanged)
-      // ────────────────────────────────────────────────
-      function caesarEncode(str, shift = 3) {
-        return str.replace(/[a-z]/gi, char => {
-          const start = char <= 'Z' ? 65 : 97;
-          return String.fromCharCode(((char.charCodeAt(0) - start + shift) % 26) + start);
-        });
-      }
+    // Close modals on backdrop click
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', e => {
+        if (e.target === m) m.classList.remove('open');
+      });
+    });
 
-      function caesarDecode(str, shift = 3) {
-        return caesarEncode(str, 26 - shift);
-      }
+    // ─── Cipher primitives ────────────────────────────────────────
+    function caesar(str, shift) {
+      return str.replace(/[a-z]/gi, ch => {
+        const base = ch <= 'Z' ? 65 : 97;
+        return String.fromCharCode(((ch.charCodeAt(0) - base + shift + 26) % 26) + base);
+      });
+    }
+    function caesarEncode(s) { return caesar(s, 3); }
+    function caesarDecode(s) { return caesar(s, -3); }
 
-      function vigenere(text, key, mode) {
-        const isEncode = mode === 'encode';
-        key = key.toUpperCase();
-        let result = '';
-        let j = 0;
-        for (let i = 0; i < text.length; i++) {
-          const c = text.charCodeAt(i);
-          if (65 <= c && c <= 90) {
-            result += String.fromCharCode((c - 65 + (isEncode ? key.charCodeAt(j % key.length) - 65 : 26 - (key.charCodeAt(j % key.length) - 65))) % 26 + 65);
-            j++;
-          } else if (97 <= c && c <= 122) {
-            result += String.fromCharCode((c - 97 + (isEncode ? key.charCodeAt(j % key.length) - 65 : 26 - (key.charCodeAt(j % key.length) - 65))) % 26 + 97);
-            j++;
-          } else {
-            result += text.charAt(i);
-          }
+    /**
+     * Proper Vigenère that only uses alphabetic key characters
+     * and always applies a positive modulo.
+     */
+    function vigenere(text, key, encode) {
+      // Keep only A–Z from the key; if empty fall back to default
+      const cleanKey = (key || '').toUpperCase().replace(/[^A-Z]/g, '') || 'HACKER';
+      let result = '';
+      let j = 0;
+      for (let i = 0; i < text.length; i++) {
+        const c = text.charCodeAt(i);
+        if (c >= 65 && c <= 90) {               // uppercase
+          const shift = cleanKey.charCodeAt(j % cleanKey.length) - 65;
+          const delta = encode ? shift : -shift;
+          result += String.fromCharCode(((c - 65 + delta + 26) % 26) + 65);
+          j++;
+        } else if (c >= 97 && c <= 122) {       // lowercase
+          const shift = cleanKey.charCodeAt(j % cleanKey.length) - 65;
+          const delta = encode ? shift : -shift;
+          result += String.fromCharCode(((c - 97 + delta + 26) % 26) + 97);
+          j++;
+        } else {
+          result += text[i];
         }
-        return result;
       }
+      return result;
+    }
+    function vigenereEncode(t, k) { return vigenere(t, k, true); }
+    function vigenereDecode(t, k) { return vigenere(t, k, false); }
 
-      function vigenereEncode(plainText, key) { return vigenere(plainText, key, 'encode'); }
-      function vigenereDecode(cipherText, key) { return vigenere(cipherText, key, 'decode'); }
+    function octalEncode(str) {
+      return [...str].map(c => c.charCodeAt(0).toString(8)).join(' ');
+    }
+    function octalDecode(str) {
+      return str.trim().split(/\s+/).filter(Boolean)
+        .map(tok => String.fromCharCode(parseInt(tok, 8))).join('');
+    }
 
-      function octalEncode(str) {
-        return str.split('').map(char => char.charCodeAt(0).toString(8)).join(' ');
+    function hexEncode(str) {
+      return [...str].map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
+    }
+    function hexDecode(str) {
+      return str.trim().split(/\s+/).filter(Boolean)
+        .map(tok => String.fromCharCode(parseInt(tok, 16))).join('');
+    }
+
+    function binaryEncode(str) {
+      return [...str].map(c => c.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
+    }
+    function binaryDecode(str) {
+      return str.trim().split(/\s+/).filter(Boolean)
+        .map(tok => String.fromCharCode(parseInt(tok, 2))).join('');
+    }
+
+    function base64Encode(str) {
+      // Unicode-safe
+      const utf8 = unescape(encodeURIComponent(str));
+      return btoa(utf8).replace(/=+$/, '');
+    }
+    function base64Decode(str) {
+      // Restore padding
+      let padded = str;
+      while (padded.length % 4) padded += '=';
+      try {
+        return decodeURIComponent(escape(atob(padded)));
+      } catch (e) {
+        // Fallback for already-decoded or malformed input
+        return atob(padded);
       }
+    }
 
-      function octalDecode(str) {
-        return str.split(' ').map(char => String.fromCharCode(parseInt(char, 8))).join('');
+    function rot13(str) {
+      return str.replace(/[a-z]/gi, ch => {
+        const base = ch <= 'Z' ? 65 : 97;
+        return String.fromCharCode(((ch.charCodeAt(0) - base + 13) % 26) + base);
+      });
+    }
+
+    function atbash(str) {
+      return str.replace(/[a-z]/gi, ch => {
+        const base = ch <= 'Z' ? 65 : 97;
+        return String.fromCharCode(base + 25 - (ch.charCodeAt(0) - base));
+      });
+    }
+
+    function injectDeadLetters(str) {
+      const freq = Math.max(1, parseInt(document.getElementById('frequencySlider').value, 10) || 3);
+      let out = '';
+      for (let i = 0; i < str.length; i++) {
+        out += str[i];
+        if ((i + 1) % freq === 0) out += randomDead();
       }
+      return out;
+    }
 
-      function hexEncode(str) {
-        return str.split('').map(char => char.charCodeAt(0).toString(16).padStart(2, '0')).join(' ');
-      }
-
-      function hexDecode(str) {
-        return str.split(' ').map(char => String.fromCharCode(parseInt(char, 16))).join('');
-      }
-
-      function binaryEncode(str) {
-        return str.split('').map(char => char.charCodeAt(0).toString(2).padStart(8, '0')).join(' ');
-      }
-
-      function binaryDecode(str) {
-        return str.split(' ').map(char => String.fromCharCode(parseInt(char, 2))).join('');
-      }
-
-      function base64Encode(str) {
-        return btoa(unescape(encodeURIComponent(str))).replace(/=+$/, '');
-      }
-
-      function base64Decode(str) {
-        return decodeURIComponent(escape(atob(str)));
-      }
-
-      function rot13Encode(str) {
-        return str.replace(/[a-z]/gi, char => {
-          const start = char <= 'Z' ? 65 : 97;
-          return String.fromCharCode(((char.charCodeAt(0) - start + 13) % 26) + start);
-        });
-      }
-
-      function rot13Decode(str) {
-        return rot13Encode(str);
-      }
-
-      function atbashEncode(str) {
-        return str.replace(/[a-z]/gi, char => {
-          const start = char <= 'Z' ? 65 : 97;
-          return String.fromCharCode(start + 25 - (char.charCodeAt(0) - start));
-        });
-      }
-
-      function atbashDecode(str) {
-        return atbashEncode(str);
-      }
-
-      function injectDeadLetters(str) {
-        const freq = parseInt(document.getElementById('frequencySlider').value) || 1;
-        let result = '';
-        for (let i = 0; i < str.length; i++) {
-          result += str[i];
-          if ((i + 1) % freq === 0) result += getRandomDeadLetter();
+    function removeDeadLetters(str) {
+      const freq = Math.max(1, parseInt(document.getElementById('frequencySlider').value, 10) || 3);
+      let out = '';
+      let counter = 0;
+      for (let i = 0; i < str.length; i++) {
+        if ((counter + 1) % (freq + 1) === 0) {
+          counter = 0;          // skip the dead character
+        } else {
+          out += str[i];
+          counter++;
         }
-        return result;
       }
+      return out;
+    }
 
-      function removeDeadLetters(str) {
-        const freq = parseInt(document.getElementById('frequencySlider').value) || 1;
-        let result = '';
-        let counter = 0;
-        for (let i = 0; i < str.length; i++) {
-          if ((counter + 1) % (freq + 1) === 0) {
-            counter = 0;
-          } else {
-            result += str[i];
-            counter++;
-          }
-        }
-        return result;
+    function randomDead() {
+      const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*';
+      return chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    // ─── Main encrypt / decrypt ───────────────────────────────────
+    function getKey() {
+      const raw = document.getElementById('vigenereKey').value.trim();
+      if (raw && !validateKey()) {
+        throw new Error('Key must contain only letters (one word)');
       }
+      return raw || 'HACKER';
+    }
 
-      function getRandomDeadLetter() {
-        const chars = '1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm!@#$%^&*';
-        return chars[Math.floor(Math.random() * chars.length)];
-      }
-
-      // ────────────────────────────────────────────────
-      // MAIN ENCRYPT / DECRYPT
-      // ────────────────────────────────────────────────
-      function encodeMessage() {
-        const key = document.getElementById('vigenereKey').value.trim();
-        if (key && key.split(' ').length > 1) {
-          showMessage('Key must be one word only!', 'error');
+    function encodeMessage() {
+      try {
+        let msg = document.getElementById('inputMessage').value;
+        if (!msg) {
+          showStatus('Enter a message first', 'warning');
           return;
         }
+        const key = getKey();
 
-        try {
-          let msg = document.getElementById('inputMessage').value;
-          const vKey = key || 'HACKER114';
+        if (document.getElementById('toggleCaesar').checked)   msg = caesarEncode(msg);
+        if (document.getElementById('toggleVigenere').checked) msg = vigenereEncode(msg, key);
+        if (document.getElementById('toggleOctal').checked)    msg = octalEncode(msg);
+        if (document.getElementById('toggleHex').checked)      msg = hexEncode(msg);
+        if (document.getElementById('toggleBinary').checked)   msg = binaryEncode(msg);
+        if (document.getElementById('toggleBase64').checked)   msg = base64Encode(msg);
+        if (document.getElementById('toggleRot13').checked)    msg = rot13(msg);
+        if (document.getElementById('toggleAtbash').checked)   msg = atbash(msg);
+        if (document.getElementById('toggleDeadLetters').checked) msg = injectDeadLetters(msg);
 
-          if (document.getElementById('toggleCaesar').checked)        msg = caesarEncode(msg);
-          if (document.getElementById('toggleVigenere').checked)      msg = vigenereEncode(msg, vKey);
-          if (document.getElementById('toggleOctal').checked)         msg = octalEncode(msg);
-          if (document.getElementById('toggleHex').checked)           msg = hexEncode(msg);
-          if (document.getElementById('toggleBinary').checked)        msg = binaryEncode(msg);
-          if (document.getElementById('toggleBase64').checked)        msg = base64Encode(msg);
-          if (document.getElementById('toggleRot13').checked)         msg = rot13Encode(msg);
-          if (document.getElementById('toggleAtbash').checked)        msg = atbashEncode(msg);
-          if (document.getElementById('toggleDeadLetters').checked)   msg = injectDeadLetters(msg);
-
-          document.getElementById('outputMessage').value = msg;
-          showMessage('Message encrypted!');
-        } catch (e) {
-          showMessage('Encryption failed: ' + e.message, 'error');
-        }
+        document.getElementById('outputMessage').value = msg;
+        showStatus('Encrypted successfully');
+      } catch (e) {
+        showStatus(e.message || 'Encryption failed', 'error');
       }
+    }
 
-      function decodeMessage() {
-        const key = document.getElementById('vigenereKey').value.trim();
-        if (key && key.split(' ').length > 1) {
-          showMessage('Key must be one word only!', 'error');
+    function decodeMessage() {
+      try {
+        let msg = document.getElementById('inputMessage').value;
+        if (!msg) {
+          showStatus('Enter a message first', 'warning');
           return;
         }
+        const key = getKey();
 
-        try {
-          let msg = document.getElementById('inputMessage').value;
-          const vKey = key || 'HACKER114';
+        // Reverse order of the encode stack
+        if (document.getElementById('toggleDeadLetters').checked) msg = removeDeadLetters(msg);
+        if (document.getElementById('toggleAtbash').checked)      msg = atbash(msg);
+        if (document.getElementById('toggleRot13').checked)       msg = rot13(msg);
+        if (document.getElementById('toggleBase64').checked)      msg = base64Decode(msg);
+        if (document.getElementById('toggleBinary').checked)      msg = binaryDecode(msg);
+        if (document.getElementById('toggleHex').checked)         msg = hexDecode(msg);
+        if (document.getElementById('toggleOctal').checked)       msg = octalDecode(msg);
+        if (document.getElementById('toggleVigenere').checked)    msg = vigenereDecode(msg, key);
+        if (document.getElementById('toggleCaesar').checked)      msg = caesarDecode(msg);
 
-          if (document.getElementById('toggleDeadLetters').checked)   msg = removeDeadLetters(msg);
-          if (document.getElementById('toggleAtbash').checked)        msg = atbashDecode(msg);
-          if (document.getElementById('toggleRot13').checked)         msg = rot13Decode(msg);
-          if (document.getElementById('toggleBase64').checked)        msg = base64Decode(msg);
-          if (document.getElementById('toggleBinary').checked)        msg = binaryDecode(msg);
-          if (document.getElementById('toggleHex').checked)           msg = hexDecode(msg);
-          if (document.getElementById('toggleOctal').checked)         msg = octalDecode(msg);
-          if (document.getElementById('toggleVigenere').checked)      msg = vigenereDecode(msg, vKey);
-          if (document.getElementById('toggleCaesar').checked)        msg = caesarDecode(msg);
-
-          document.getElementById('outputMessage').value = msg;
-          showMessage('Message decrypted!');
-        } catch (e) {
-          showMessage('Decryption failed: ' + e.message, 'error');
-        }
+        document.getElementById('outputMessage').value = msg;
+        showStatus('Decrypted successfully');
+      } catch (e) {
+        showStatus(e.message || 'Decryption failed', 'error');
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
